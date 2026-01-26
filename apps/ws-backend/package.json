@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -b",
-    "start": "node dist/index.js",
-    "dev": "npm run build && npm run start"
+    "start": "concurrently \"node dist/index.js\" \"node dist/worker/chatWorker.js\"",
+    "dev": "npm run build && npm run start "
   },
   "devDependencies": {
     "@repo/backend-common": "workspace:*",
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "concurrently": "^9.2.1"
   },
   "keywords": [],
   "author": "",

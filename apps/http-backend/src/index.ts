@@ -5,10 +5,11 @@ import { authMiddleware } from "./middleware"
 import { CreateRoomSchema, CreatUserSchema, SigninSchema } from "@repo/common/zodSchema"
 import { prismaClient } from "@repo/db/client"
 import bcrypt from "bcrypt"
-import console, { error } from "node:console"
+import cors from "cors"
 
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 app.post('/signup', async (req, res) => {
 
@@ -151,6 +152,18 @@ app.get('/chats/:roomId', async (req , res ) => {
 
     res.json({
         messages
+    })
+})
+
+app.get("/room/:slug", async (req, res) => {
+    const slug = req.params.slug
+    const roomId = await prismaClient.room.findFirst({
+        where:{
+            slug:slug
+        }
+    })
+    res.json({
+        roomId
     })
 })
 

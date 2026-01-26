@@ -9,7 +9,7 @@ const worker = new Worker(
 
         await prismaClient.chat.create({
             data: {
-                roomId,
+                roomId:Number(roomId),
                 message,
                 userId
             },
@@ -24,7 +24,6 @@ const worker = new Worker(
     }
 );
 
-// 🔥 ADD THESE LISTENERS
 worker.on("failed", (job, err) => {
     console.error("JOB FAILED:", job?.data);
     console.error("ERROR:", err);

@@ -30,7 +30,8 @@ export function authMiddleware(req:Request, res:Response, next:NextFunction){
         const decoded = jwt.verify(token, JWT_SECRET!) as AuthJwtPayload
         req.userId = decoded.userId
         next()
-    }catch {
+    }catch(e) {
+
         return res.status(401).json({
             message:"Invalid token / Unauthorized"
         })
