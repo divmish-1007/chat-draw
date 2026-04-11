@@ -116,10 +116,10 @@ app.post('/room', authMiddleware, async (req, res) => {
             message: "Unauthorized"
         })
     }
-
+    const slug = parrsed.data.room.trim().toLowerCase();
     const existingRoom = await prismaClient.room.findUnique({
         where: {
-            slug: parrsed.data.room
+            slug
         }
     })
 
@@ -131,7 +131,7 @@ app.post('/room', authMiddleware, async (req, res) => {
 
     const room = await prismaClient.room.create({
         data: {
-            slug: parrsed.data.room,
+            slug,
             adminId: userId,
         }
     })
