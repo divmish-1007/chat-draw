@@ -117,6 +117,11 @@ app.post('/room', authMiddleware, async (req, res) => {
         })
     }
     const slug = parrsed.data.room.trim().toLowerCase();
+    if(!slug){
+        return res.status(401).json({
+            message:"Room name cannot be empty"
+        })
+    }
     const existingRoom = await prismaClient.room.findUnique({
         where: {
             slug

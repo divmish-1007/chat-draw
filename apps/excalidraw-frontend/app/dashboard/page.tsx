@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { BACKEND_URL } from "@/config";
@@ -10,15 +10,22 @@ export default function Dashboard() {
   const [roomName, setRoomName] = useState("");
   const router = useRouter();
   const [loading, setLoading] = useState(true)
+  const [isCreating, setIsCreating] = useState(false)
+  const [error, setError] = useState("")
+  const inputref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
     if (!token) {
       router.replace("/signin");
+      return;
     }
 
     setLoading(false)
+
+    // Auto focus on input box when loads the page
+    
 
     async function fetchRooms() {
       try {
@@ -34,13 +41,21 @@ export default function Dashboard() {
   }, [router]);
 
   async function createRoom() {
-    if (!roomName) {
+
+    if (!roomName.trim()) {
+      setError("Room name cannot be empty");
+      inputref.current?.select();
+      inputref.current?.focus();
       return;
     }
+
+    setIsCreating(true)
+    setError("");
+
     try {
       const token = localStorage.getItem('token')
-      
-      await axios.post(`${BACKEND_URL}/room`,
+
+      const resp = await axios.post(`${BACKEND_URL}/room`,
         { room: roomName },
         {
           headers: {
@@ -49,12 +64,19 @@ export default function Dashboard() {
         }
       );
 
-      setRoomName("")
-      const res = await axios.get(`${BACKEND_URL}/rooms`);
-      setRooms(res.data.rooms)
+      // Auto Join After Creation of the room
+      const roomId = resp.data.roomId;
+      setRoomName("");
+      router.push(`/canvas/${roomId}`);
 
     } catch (err: any) {
-      console.error(err?.response?.data?.message || "Create Failed")
+      setError(err?.response?.data?.message || "Create Failed")
+      setTimeout(() => {
+        inputref.current?.focus();
+        inputref.current?.select();
+      }, 0)
+    } finally {
+      setIsCreating(false)
     }
 
   }
@@ -76,16 +98,33 @@ export default function Dashboard() {
     <div>
       {/* Create Room */}
       <div>
-        <input
-          value={roomName}
-          onChange={(e) => setRoomName(e.target.value)}
-          placeholder="Enter room name"
-        />
-        <button onClick={createRoom}>
-          Create Room
-        </button>
-      </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            createRoom();
+          }}
+        >
+          <input
+            ref={inputref}
+            className="px-3 py-2 border"
+            autoFocus
+            value={roomName}
+            onChange={(e) => {
+              setRoomName(e.target.value)
+              setError("")
+            }}
+            placeholder="Enter room name"
+          />
 
+          {/* Possible Errors Visible in UI */}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+
+          <button type="submit" disabled={isCreating}>
+            {isCreating ? "Creating..." : "Create-Room"}
+          </button>
+        </form>
+
+      </div>
       {/* Room List */}
       <div>
         {rooms.length === 0 && <p>No rooms yet </p>}
