@@ -85,7 +85,7 @@ wss.on('connection', function connection(ws, request) {
 
             const roomId = parsedData.roomId;
             const msg = parsedData.message
-            console.log(JSON.parse(msg))
+            // console.log(JSON.parse(msg))
             const sender = users.find(x => x.ws === ws)
             if (!sender) {
                 return

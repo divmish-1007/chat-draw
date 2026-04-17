@@ -14,7 +14,7 @@ const worker = new Worker(
                 userId
             },
         });
-        console.log("DB Saved")
+
     },
     {
         connection: {

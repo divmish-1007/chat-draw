@@ -18,7 +18,6 @@ interface AuthJwtPayload extends JwtPayload{
 
 
 export function authMiddleware(req:Request, res:Response, next:NextFunction){
-    console.log("HEADER:", req.headers.authorization);
     const authHeader = req.headers.authorization;
     if(!authHeader){
         res.status(404).json({
